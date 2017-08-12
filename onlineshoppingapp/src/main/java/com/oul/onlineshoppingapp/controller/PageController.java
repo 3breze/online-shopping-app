@@ -1,18 +1,28 @@
 package com.oul.onlineshoppingapp.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.oul.shoppingbackend.dao.CategoryDao;
+import com.oul.shoppingbackend.dto.Category;
 
 @Controller
 public class PageController {
-
+	
+	@Autowired
+	private CategoryDao categoryDao;
+	
 	@RequestMapping(value = { "/", "/home", "/index" })
 	public ModelAndView index() {
 		ModelAndView mv = new ModelAndView("page");
 		mv.addObject("title", "Home");
+		
+		//passing the list of the categories
+		mv.addObject("categories", categoryDao.list());
+		
 		mv.addObject("userClickHome", true);
 		return mv;
 	}
@@ -32,7 +42,47 @@ public class PageController {
 		mv.addObject("userClickContact", true);
 		return mv;
 	}
+	
+	/*
+	 * Methonds to load all the producs and based on category
+	 * 
+	 */
+	@RequestMapping(value = { "/show/all/products" })
+	public ModelAndView showAllProducts() {
+		ModelAndView mv = new ModelAndView("page");
+		mv.addObject("title", "All Products");
+		
+		//passing the list of the categories
+		mv.addObject("categories", categoryDao.list());
+		
+		mv.addObject("userClickAllProducts", true);
+		return mv;
+	}
 
+	@RequestMapping(value = { "/show/category/{id}/products" })
+	public ModelAndView showCategoryProducts(@PathVariable("id") int id) {
+		ModelAndView mv = new ModelAndView("page");
+		
+		//categoryDao to fetch a single category
+		Category category = null;
+		category = categoryDao.get(id);
+		
+		mv.addObject("title", category.getName());
+		
+		//passing the list of the categories
+		mv.addObject("categories", categoryDao.list());
+		
+		//passing the single category object
+		mv.addObject("category", category);
+		
+		mv.addObject("userClickCategoryProducts", true);
+		return mv;
+	}
+	
+	/*
+	 * Old stuff- earlier in the course
+	 */
+	
 //	@RequestMapping(value = "/test")
 //	// u url mora da se koristi greeting inace dobijamo 400
 //	// public ModelAndView test(@RequestParam("greeting")String greeting){
